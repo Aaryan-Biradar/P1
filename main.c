@@ -70,6 +70,22 @@ int main() {
                     }
                 }
                 break;
+            case MENU_DATA:
+                printf("Enter name and data (hex): ");
+                scanf("%31s %X", name, &data);
+                index = subsys_find(&collection, name);
+                if (index < 0) {
+                    printf("Subsystem not found.\n");
+                } else {
+                    unsigned int old_data;
+                    result = subsys_data_set(&collection.subsystems[index], data, &old_data);
+                    if (result != ERR_SUCCESS) {
+                        printf("Data set error.\n");
+                    } else if (old_data != 0) {
+                        printf("Old data: %08X\n", old_data);
+                    }
+                }
+                break;
             
             case MENU_EXIT:
                 return 0;

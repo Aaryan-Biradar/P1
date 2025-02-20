@@ -43,15 +43,16 @@ int subsys_print(Subsystem *subsystem) {
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
     }
-
-    // same format as seen in project overview however, name is printed from the left side
-    printf("Name: %-16s | ", subsystem->name);
-    printf("Status: (");
+    printf("Name: %-16s ", subsystem->name);
     subsys_status_print(subsystem);
-    
-
+    unsigned int data;
+    int result = subsys_data_get(subsystem, &data);
+    if (result == ERR_SUCCESS) {
+        printf("| Data: %08X", data);
+    }
+    printf(")\n");
     return ERR_SUCCESS;
-}   
+} 
 
 int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char value) {
     if (subsystem == NULL) {                                                                // Anushka - error checking  for value?
@@ -100,7 +101,7 @@ int subsys_status_print(const Subsystem *subsystem) {
         return ERR_NULL_POINTER;
     }
     unsigned char status = subsystem->status;
-    printf("PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d)\n", // Anushka - change brackets once we get to the data part
+    printf("PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d", // Anushka - change brackets once we get to the data part
            (status >> STATUS_POWER) & 1,
            (status >> STATUS_DATA) & 1,
            (status >> STATUS_ACTIVITY) & 1,
@@ -108,4 +109,33 @@ int subsys_status_print(const Subsystem *subsystem) {
            (status >> 2) & 0x03,
            status & 0x03);
     return ERR_SUCCESS;
+}
+
+int subsys_data_set(Subsystem *subsystem, unsigned int new_data, unsigned int *old_data) {
+    if (subsystem == NULL) {
+        return ERR_NULL_POINTER;
+    }
+    // stores old data in old_data if it is not first time setting data
+    if (old_data != NULL) {
+        *old_data = subsystem->data;
+    }
+    subsystem->data = new_data;
+    return subsys_status_set(subsystem, STATUS_DATA, 1);
+}
+
+int subsys_data_get(Subsystem *subsystem, unsigned int *data) {
+    if (subsystem == NULL || data == NULL) {
+        return ERR_NULL_POINTER;
+    }
+    // true if there is no data to get
+    if (!((subsystem->status >> STATUS_DATA) & 1)) {
+        *data = 0;
+        return ERR_NO_DATA;
+    }
+
+    // there is data to get
+    *data = subsystem->data;
+    subsystem->data = 0;
+    // clear the data status bit
+    return subsys_status_set(subsystem, STATUS_DATA, 0);
 }
