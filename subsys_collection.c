@@ -45,3 +45,15 @@ int subsys_find(const SubsystemCollection *subsystems, const char *name) {
     return ERR_SYS_NOT_FOUND;
 }
 
+int subsys_collection_print(SubsystemCollection *subsystems) {
+    if (subsystems == NULL) {
+        return ERR_NULL_POINTER;
+    }
+
+    for (int i = 0; i < subsystems->size; i++) {
+        subsys_print(&subsystems->subsystems[i]);                                               //prints adress not value
+    }
+
+    return ERR_SUCCESS;
+}   
+
