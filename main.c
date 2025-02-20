@@ -18,7 +18,55 @@ int print_menu(int *choice);
 int main() {
     // Use a while loop to print the menu for the user and call the appropriate functions.
     // The definitions above are provided to assist with this.
+
+    SubsystemCollection collection;
+    subsys_collection_init(&collection);
+    int choice;
+    int result;
+    char name[MAX_STR];
+    char filter_str[9];
+    unsigned char status_id, value;
+    unsigned int data;
+
+    while (1) {
+        print_menu(&choice);
+        switch (choice) {
+            case MENU_ADD:
+                printf("Enter subsystem name: ");
+                scanf("%31s", name);
+                Subsystem sub;
+                subsys_init(&sub, name, 0);
+                result = subsys_append(&collection, &sub);
+                if (result != ERR_SUCCESS) {
+                    printf("Error adding subsystem.\n");
+                }
+                break;
+            case MENU_PRINT:
+                printf("Enter subsystem name: ");
+                scanf("%31s", name);
+                int index = subsys_find(&collection, name);
+                if (index < 0) {
+                    printf("Subsystem not found.\n");
+                } else {
+                    subsys_print(&collection.subsystems[index]);
+                }
+                break;
+            case MENU_PRINTALL:
+                result = subsys_collection_print(&collection);
+                if (result != ERR_SUCCESS) {
+                    printf("No subsystems to display.\n");
+                }
+                break;
+            
+            case MENU_EXIT:
+                return 0;
+            default:
+                printf("Invalid choice.\n");
+                break;
+        }
+    }
     return 0;
+
 }
 
 /* 
