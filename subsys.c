@@ -19,4 +19,16 @@ int init_subsystem(Subsystem *subsystem, const char *name, char status) {
     return ERR_SUCCESS;
 }
 
+int subsys_print(Subsystem *subsystem) {
+    if (subsystem == NULL) {
+        return ERR_NULL_POINTER;
+    }
+
+    printf("Name: %16s", subsystem->name);
+    printf("Status: ");
+    subsys_status_print(subsystem);
+    printf("Data: %d\n", subsystem->data);
+
+    return ERR_SUCCESS;
+}   
 
