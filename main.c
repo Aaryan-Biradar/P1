@@ -57,6 +57,19 @@ int main() {
                     printf("No subsystems to display.\n");
                 }
                 break;
+            case MENU_STATUS:
+                printf("Enter name, status ID, value: ");
+                scanf("%31s %hhu %hhu", name, &status_id, &value);
+                index = subsys_find(&collection, name);
+                if (index < 0) {
+                    printf("Subsystem not found.\n");
+                } else {
+                    result = subsys_status_set(&collection.subsystems[index], status_id, value);
+                    if (result != ERR_SUCCESS) {
+                        printf("Invalid status update.\n");
+                    }
+                }
+                break;
             
             case MENU_EXIT:
                 return 0;

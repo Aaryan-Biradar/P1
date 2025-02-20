@@ -46,9 +46,66 @@ int subsys_print(Subsystem *subsystem) {
 
     // same format as seen in project overview however, name is printed from the left side
     printf("Name: %-16s | ", subsystem->name);
-    printf("Status: %d | \n", subsystem->status);
-    //subsys_status_print(subsystem);
+    printf("Status: (");
+    subsys_status_print(subsystem);
+    
 
     return ERR_SUCCESS;
 }   
 
+int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char value) {
+    if (subsystem == NULL) {                                                                // Anushka - error checking  for value?
+        return ERR_NULL_POINTER;
+    }
+
+    unsigned char mask;
+    switch (status) {
+        case STATUS_POWER:
+        case STATUS_DATA:
+        case STATUS_ACTIVITY:
+        case STATUS_ERROR:
+            if (value > 1) {
+                return ERR_INVALID_STATUS;
+            }
+            mask = 1 << status;
+            // (subsystem->status & ~mask) clears the bit at the status position, ((value << status) & mask) sets the bit at the status position
+            subsystem->status = (subsystem->status & ~mask) | ((value << status) & mask);
+            break;
+        case STATUS_PERFORMANCE:
+            if (value > 3) {
+                return ERR_INVALID_STATUS;
+            }
+            // 0x0C is 00001100
+            mask = 0x0C;
+            // (subsystem->status & ~mask) clears the bits at the performance position, ((value << 2) & mask) sets the bits at the performance position
+            subsystem->status = (subsystem->status & ~mask) | ((value << 2) & mask);
+            break;
+        case STATUS_RESOURCE:
+            if (value > 3) {
+                return ERR_INVALID_STATUS;
+            }
+            // 0x03 is 00000011
+            mask = 0x03;
+            // (subsystem->status & ~mask) clears the bits at the resource position, (value & mask) sets the bits at the resource position
+            subsystem->status = (subsystem->status & ~mask) | (value & mask);
+            break;
+        default:
+            return ERR_INVALID_STATUS;
+    }
+    return ERR_SUCCESS;
+}
+
+int subsys_status_print(const Subsystem *subsystem) {
+    if (subsystem == NULL) {
+        return ERR_NULL_POINTER;
+    }
+    unsigned char status = subsystem->status;
+    printf("PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d)\n", // Anushka - change brackets once we get to the data part
+           (status >> STATUS_POWER) & 1,
+           (status >> STATUS_DATA) & 1,
+           (status >> STATUS_ACTIVITY) & 1,
+           (status >> STATUS_ERROR) & 1,
+           (status >> 2) & 0x03,
+           status & 0x03);
+    return ERR_SUCCESS;
+}
