@@ -104,3 +104,53 @@ int subsys_collection_print(SubsystemCollection *subsystems) {
     return ERR_SUCCESS;
 }   
 
+int subsys_remove(SubsystemCollection *subsystems, int index){
+    if (subsystems == NULL){
+        return ERR_NULL_POINTER;
+    }
+    if (index < 0 || index >= subsystems->size){
+        return ERR_INVALID_INDEX;
+    }
+    for (int i = index; i < subsystems->size - 1; i++){
+        subsystems->subsystems[i] = subsystems->subsystems[i + 1];
+    }
+    subsystems->size--;
+    return ERR_SUCCESS;
+}
+
+
+int subsys_filter(const SubsystemCollection *src, SubsystemCollection *dest, const unsigned char *filter){
+    if (src == NULL || dest == NULL || filter == NULL){
+        return ERR_NULL_POINTER;
+    }
+
+    unsigned char filter_mask = 0;
+    unsigned char wildcard_mask = 0;
+
+    for (int i = 0; i < 8; i++){
+        if (filter[i] == '1'){
+            filter_mask |= (1 << (7 - i));
+        }
+        else if (filter[i] == '*'){
+            wildcard_mask |= (1 << (7 - i))
+        }
+        else {
+            err ERR_INVALID_STATUS;
+        }
+
+        filter_mask = ~filter_mask;
+
+        subsys_collection_init(dest)
+
+        for (int i = 0; i < src->size; i++){
+            if (((filter_mask ^ (src->subsystems[i]).status) | wildcard_mask) == 0b11111111){
+                int result = subsys_append(dest, &(src->subsystems[i]))
+                if (result != ERR_SUCCESS){
+                    return result;
+                }
+            }
+        }
+    }
+
+    return ERR_SUCCESS;
+}
