@@ -71,7 +71,7 @@ int main() {
                 }
                 break;
             case MENU_DATA:
-                printf("Enter name and data (hex): ");
+                printf("Enter name and data (HEX all caps without 0x): ");
                 scanf("%31s %X", name, &data);
                 index = subsys_find(&collection, name);
                 if (index < 0) {
