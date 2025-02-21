@@ -87,10 +87,10 @@ int main() {
                 }
                 break;
             case MENU_FILTER:
-                printf("Enter filter (8 chars 0/1/): ");
+                printf("Enter filter (8 chars 0/1/*): ");
                 scanf("%8s", filter_str);
                 SubsystemCollection filtered;
-                result = subsys_filter(&collection, &filtered, (const unsigned char)&filter_str);
+                result = subsys_filter(&collection, &filtered, (const unsigned char*)filter_str);
                 if (result == ERR_SUCCESS) {
                     subsys_collection_print(&filtered);
                 } else {

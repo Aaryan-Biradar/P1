@@ -119,38 +119,35 @@ int subsys_remove(SubsystemCollection *subsystems, int index){
 }
 
 
-int subsys_filter(const SubsystemCollection *src, SubsystemCollection *dest, const unsigned char *filter){
-    if (src == NULL || dest == NULL || filter == NULL){
+int subsys_filter(const SubsystemCollection *src, SubsystemCollection *dest, const unsigned char *filter) {
+    if (src == NULL || dest == NULL || filter == NULL) {
         return ERR_NULL_POINTER;
     }
-
     unsigned char filter_mask = 0;
     unsigned char wildcard_mask = 0;
-
-    for (int i = 0; i < 8; i++){
-        if (filter[i] == '1'){
-            filter_mask |= (1 << (7 - i));
-        }
-        else if (filter[i] == '*'){
-            wildcard_mask |= (1 << (7 - i));
-        }
-        else {
+    for (int i = 0; i < 8; i++) {
+        char c = filter[i];
+        if (c == '0') {
+            filter_mask |= 0 << (7 - i);
+        } else if (c == '1') {
+            filter_mask |= 1 << (7 - i);
+        } else if (c == '*') {
+            wildcard_mask |= 1 << (7 - i);
+        } else {
             return ERR_INVALID_STATUS;
         }
-
-        filter_mask = ~filter_mask;
-
-        subsys_collection_init(dest);
-
-        for (int i = 0; i < src->size; i++){
-            if (((filter_mask ^ (src->subsystems[i]).status) | wildcard_mask) == 0b11111111){
-                int result = subsys_append(dest, &(src->subsystems[i]));
-                if (result != ERR_SUCCESS){
-                    return result;
-                }
+    }
+    filter_mask = ~filter_mask;
+    subsys_collection_init(dest);
+    for (int i = 0; i < src->size; i++) {
+        Subsystem sub = src->subsystems[i];
+        unsigned char result = (filter_mask ^ sub.status) | wildcard_mask;
+        if (result == 0xFF) {
+            int append_result = subsys_append(dest, &sub);
+            if (append_result != ERR_SUCCESS) {
+                return append_result;
             }
         }
     }
-
     return ERR_SUCCESS;
 }
