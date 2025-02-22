@@ -45,12 +45,15 @@ int subsys_print(Subsystem *subsystem) {
     }
     printf("Name: %-16s ", subsystem->name);
     subsys_status_print(subsystem);
+
+    // if data is avalible add it to the end of status
     unsigned int data;
-    int result = subsys_data_get(subsystem, &data);
-    if (result == ERR_SUCCESS) {
-        printf("| Data: %08X", data);
+    if (subsys_data_get(subsystem, &data) == ERR_SUCCESS) {
+        printf(" | Data: %08X", data);
     }
-    printf(")\n");
+
+    // "]" formating for status
+    printf("]\n");
     return ERR_SUCCESS;
 } 
 
@@ -61,6 +64,7 @@ int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char 
 
     unsigned char mask;
     switch (status) {
+        // same cases of either 0 or 1
         case STATUS_POWER:
         case STATUS_DATA:
         case STATUS_ACTIVITY:
@@ -76,8 +80,8 @@ int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char 
             if (value > 3) {
                 return ERR_INVALID_STATUS;
             }
-            // 0x0C is 00001100
-            mask = 0x0C;
+
+            mask = 0b00001100;
             // (subsystem->status & ~mask) clears the bits at the performance position, ((value << 2) & mask) sets the bits at the performance position
             subsystem->status = (subsystem->status & ~mask) | ((value << 2) & mask);
             break;
@@ -85,8 +89,8 @@ int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char 
             if (value > 3) {
                 return ERR_INVALID_STATUS;
             }
-            // 0x03 is 00000011
-            mask = 0x03;
+            
+            mask = 0b00000011;
             // (subsystem->status & ~mask) clears the bits at the resource position, (value & mask) sets the bits at the resource position
             subsystem->status = (subsystem->status & ~mask) | (value & mask);
             break;
@@ -100,14 +104,17 @@ int subsys_status_print(const Subsystem *subsystem) {
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
     }
+
+
     unsigned char status = subsystem->status;
-    printf("PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d", // Anushka - change brackets once we get to the data part
+    printf("[PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d",
            (status >> STATUS_POWER) & 1,
            (status >> STATUS_DATA) & 1,
            (status >> STATUS_ACTIVITY) & 1,
            (status >> STATUS_ERROR) & 1,
-           (status >> 2) & 0x03,
-           status & 0x03);
+           (status >> 2) & 0b00000011,
+            status & 0b00000011);
+
     return ERR_SUCCESS;
 }
 
@@ -115,10 +122,12 @@ int subsys_data_set(Subsystem *subsystem, unsigned int new_data, unsigned int *o
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
     }
-    // stores old data in old_data if it is not first time setting data
+    // stores old data in old_data if it is not first time setting data (aka not NULL)
     if (old_data != NULL) {
         *old_data = subsystem->data;
     }
+
+    // store data and change status to True
     subsystem->data = new_data;
     return subsys_status_set(subsystem, STATUS_DATA, 1);
 }
@@ -133,9 +142,9 @@ int subsys_data_get(Subsystem *subsystem, unsigned int *data) {
         return ERR_NO_DATA;
     }
 
-    // there is data to get
     *data = subsystem->data;
     subsystem->data = 0;
+
     // clear the data status bit
     return subsys_status_set(subsystem, STATUS_DATA, 0);
 }
