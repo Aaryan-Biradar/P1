@@ -52,7 +52,6 @@ int main() {
                 }
                 break;
             case MENU_PRINTALL:
-                printf("\n");
                 result = subsys_collection_print(&collection);
                 if (result != ERR_SUCCESS) {
                     printf("No subsystems to display.\n");
@@ -71,8 +70,29 @@ int main() {
                     }
                 }
                 break;
+            case MENU_REMOVE:
+                printf("Enter subsystem name: ");
+                scanf("%31s", name);
+                index = subsys_find(&collection, name);
+                if (index < 0) {
+                    printf("Subsystem not found.\n");
+                } else {
+                    subsys_remove(&collection, index);
+                }
+                break;
+            case MENU_FILTER:
+                printf("Enter filter (8 chars 0/1/*): ");
+                scanf("%8s", filter_str);
+                SubsystemCollection filtered;
+                result = subsys_filter(&collection, &filtered, (const unsigned char*)filter_str);
+                if (result == ERR_SUCCESS) {
+                    subsys_collection_print(&filtered);
+                } else {
+                    printf("Filter error.\n");
+                }
+                break;
             case MENU_DATA:
-                printf("Enter name and data (HEX all caps without 0x): ");
+                printf("Enter name and data (HEX in all CAPS without 0x): ");
                 scanf("%31s %X", name, &data);
                 index = subsys_find(&collection, name);
                 if (index < 0) {
@@ -87,27 +107,6 @@ int main() {
                     }
                 }
                 break;
-            case MENU_FILTER:
-                printf("Enter filter (8 chars 0/1/*): ");
-                scanf("%8s", filter_str);
-                SubsystemCollection filtered;
-                result = subsys_filter(&collection, &filtered, (const unsigned char*)filter_str);
-                if (result == ERR_SUCCESS) {
-                    subsys_collection_print(&filtered);
-                } else {
-                    printf("Filter error.\n");
-                }
-                break;
-            case MENU_REMOVE:
-                printf("Enter subsystem name: ");
-                    scanf("%31s", name);
-                    index = subsys_find(&collection, name);
-                    if (index < 0) {
-                        printf("Subsystem not found.\n");
-                    } else {
-                        subsys_remove(&collection, index);
-                    }
-                    break;
             case MENU_EXIT:
                 return 0;
             default:
@@ -116,7 +115,6 @@ int main() {
         }
     }
     return 0;
-
 }
 
 /* 
