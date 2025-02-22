@@ -7,13 +7,14 @@
 */
 
 /* 
-Initializes an empty SubsystemCollection.
+Initializes an empty SubsystemCollection by setting its size to 0.
 
-out subsystems: Collection to initialize
+Parameters:
+    out subsystems: Pointer to the SubsystemCollection to initialize.
 
 Returns:
-    - ERR_SUCCESS on success
-    - ERR_NULL_POINTER if subsystems is NULL
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystems` is NULL.
 */
 int subsys_collection_init(SubsystemCollection *subsystems) {
     if (subsystems == NULL) {
@@ -26,15 +27,16 @@ int subsys_collection_init(SubsystemCollection *subsystems) {
 }
 
 /* 
-Adds a copy of a subsystem to the collection.
+Adds a copy of a subsystem to the collection. Prints a success message on addition.
 
-in/out subsystems: Collection to modify
-in subsystem: Subsystem to copy into collection
+Parameters:
+    in/out subsystems: Pointer to the SubsystemCollection to modify.
+    in subsystem: Pointer to the Subsystem to copy into the collection.
 
 Returns:
-    - ERR_SUCCESS on success
-    - ERR_NULL_POINTER if subsystems/subsystem is NULL
-    - ERR_MAX_CAPACITY if collection is full
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystems` or `subsystem` is NULL.
+    - ERR_MAX_CAPACITY if the collection is full (MAX_ARR reached).
 */
 int subsys_append(SubsystemCollection *subsystems, const Subsystem *subsystem) {
     if (subsystems == NULL || subsystem == NULL) {
@@ -56,15 +58,16 @@ int subsys_append(SubsystemCollection *subsystems, const Subsystem *subsystem) {
 
 
 /* 
-Finds first subsystem with matching name in collection.
+Finds the first subsystem in the collection with a matching name.
 
-in subsystems: Collection to search
-in name: Name to search for
+Parameters:
+    in subsystems: Pointer to the SubsystemCollection to search.
+    in name: Name of the subsystem to find.
 
 Returns:
-    - Index of subsystem if found
-    - ERR_SYS_NOT_FOUND if not found
-    - ERR_NULL_POINTER if subsystems/name is NULL
+    - Index of the subsystem if found.
+    - ERR_SYS_NOT_FOUND if no match is found.
+    - ERR_NULL_POINTER if `subsystems` or `name` is NULL.
 */
 int subsys_find(const SubsystemCollection *subsystems, const char *name) {
     if (subsystems == NULL || name == NULL) {
@@ -83,13 +86,14 @@ int subsys_find(const SubsystemCollection *subsystems, const char *name) {
 
 
 /* 
-Prints all subsystems in a collection.
+Prints all subsystems in the collection using `subsys_print()`.
 
-in/out subsystems: Collection to print
+Parameters:
+    in subsystems: Pointer to the SubsystemCollection to print.
+
 Returns:
-    - ERR_SUCCESS on success
-    - ERR_NULL_POINTER if subsystems is NULL
-    - ERR_NO_DATA if collection is empty
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystems` is NULL.
 */
 int subsys_collection_print(SubsystemCollection *subsystems) {
     if (subsystems == NULL) {
@@ -104,6 +108,18 @@ int subsys_collection_print(SubsystemCollection *subsystems) {
     return ERR_SUCCESS;
 }   
 
+/* 
+Removes a subsystem from the collection by index and shifts remaining elements left.
+
+Parameters:
+    in/out subsystems: Pointer to the SubsystemCollection to modify.
+    in index: Index of the subsystem to remove.
+
+Returns:
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystems` is NULL.
+    - ERR_INVALID_INDEX if `index` is out of bounds.
+*/
 int subsys_remove(SubsystemCollection *subsystems, int index){
     if (subsystems == NULL){
         return ERR_NULL_POINTER;
@@ -121,7 +137,20 @@ int subsys_remove(SubsystemCollection *subsystems, int index){
     return ERR_SUCCESS;
 }
 
+/* 
+Filters subsystems into a destination collection based on a status bitmask filter.
 
+Parameters:
+    in src: Pointer to the source SubsystemCollection.
+    out dest: Pointer to the destination SubsystemCollection for filtered results.
+    in filter: 8-character filter string
+
+Returns:
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `src`, `dest`, or `filter` is NULL.
+    - ERR_INVALID_STATUS if `filter` contains invalid characters.
+    - ERR_MAX_CAPACITY if `dest` is full during appending.
+*/
 int subsys_filter(const SubsystemCollection *src, SubsystemCollection *dest, const unsigned char *filter) {
     if (src == NULL || dest == NULL || filter == NULL) {
         return ERR_NULL_POINTER;
