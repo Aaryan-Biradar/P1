@@ -9,13 +9,14 @@
 /* 
 Initializes a Subsystem structure with a name and initial status.
 
-in/out subsystem: Subsystem structure to initialize
-in name: Name of the subsystem (max 31 characters)
-in status: Initial status value for the subsystem
+Parameters:
+    in/out subsystem: Subsystem structure to initialize.
+    in name: Name of the subsystem (max 31 characters, null-terminated).
+    in status: Initial status byte (8-bit value, not a pointer).
 
 Returns:
-    - ERR_SUCCESS on success
-    - ERR_NULL_POINTER if subsystem/name is NULL
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystem` or `name` is NULL.
 */
 int subsys_init(Subsystem *subsystem, const char *name, char status) {
     if (subsystem == NULL || name == NULL) {                                            // Anushka - check if status is NULL?
@@ -31,13 +32,17 @@ int subsys_init(Subsystem *subsystem, const char *name, char status) {
 }
 
 /* 
-Prints subsystem details including status flags and queued data.
+Prints subsystem details including status flags and queued data (if available).
 
-in/out subsystem: Subsystem to print
+Parameters:
+    in subsystem: Subsystem to print.
 
 Returns:
-    - ERR_SUCCESS on success
-    - ERR_NULL_POINTER if subsystem is NULL
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystem` is NULL.
+
+Note:
+    - Clears the DATA status bit after printing if data was present.
 */
 int subsys_print(Subsystem *subsystem) {
     if (subsystem == NULL) {
@@ -57,6 +62,21 @@ int subsys_print(Subsystem *subsystem) {
     return ERR_SUCCESS;
 } 
 
+/* 
+Sets a specific status flag in the subsystem's status byte.
+
+Parameters:
+    in/out subsystem: Subsystem to modify.
+    in status: Status flag to modify (STATUS_POWER, STATUS_DATA, etc.).
+    in value: Value to set:
+        - 0/1 for single-bit flags (POWER/DATA/ACTIVITY/ERROR).
+        - 0-3 for 2-bit flags (PERFORMANCE/RESOURCE).
+
+Returns:
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystem` is NULL.
+    - ERR_INVALID_STATUS if `status` is invalid or `value` is out of range.
+*/
 int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char value) {
     if (subsystem == NULL) {                                                                // Anushka - error checking  for value?
         return ERR_NULL_POINTER;
@@ -100,11 +120,24 @@ int subsys_status_set(Subsystem *subsystem, unsigned char status, unsigned char 
     return ERR_SUCCESS;
 }
 
+
+/* 
+Prints the subsystem's status flags in a human-readable format.
+
+Parameters:
+    in subsystem: Subsystem to print.
+
+Returns:
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystem` is NULL.
+
+Output Format:
+    [PWR: X | DATA: X | ACT: X | ERR: X | PERF: XX | RES: XX]
+*/
 int subsys_status_print(const Subsystem *subsystem) {
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
     }
-
 
     unsigned char status = subsystem->status;
     printf("[PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d",
@@ -118,6 +151,19 @@ int subsys_status_print(const Subsystem *subsystem) {
     return ERR_SUCCESS;
 }
 
+
+/* 
+Updates the subsystem's data field and sets the DATA status flag.
+
+Parameters:
+    in/out subsystem: Subsystem to modify.
+    in new_data: New data value to store.
+    out old_data: Optional pointer to receive previous data (NULL allowed).
+
+Returns:
+    - ERR_SUCCESS on success.
+    - ERR_NULL_POINTER if `subsystem` is NULL.
+*/
 int subsys_data_set(Subsystem *subsystem, unsigned int new_data, unsigned int *old_data) {
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
@@ -132,6 +178,19 @@ int subsys_data_set(Subsystem *subsystem, unsigned int new_data, unsigned int *o
     return subsys_status_set(subsystem, STATUS_DATA, 1);
 }
 
+/* 
+Retrieves the subsystem's data and clears the DATA status flag.
+
+Parameters:
+    in/out subsystem: Subsystem to read from.
+    out data: Pointer to store retrieved data.
+
+Returns:
+    - ERR_SUCCESS on success (data valid).
+    - ERR_NULL_POINTER if `subsystem` or `data` is NULL.
+    - ERR_NO_DATA if no data is available (DATA status bit not set).
+
+*/
 int subsys_data_get(Subsystem *subsystem, unsigned int *data) {
     if (subsystem == NULL || data == NULL) {
         return ERR_NULL_POINTER;
