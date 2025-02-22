@@ -52,6 +52,7 @@ int main() {
                 }
                 break;
             case MENU_PRINTALL:
+                printf("\n");
                 result = subsys_collection_print(&collection);
                 if (result != ERR_SUCCESS) {
                     printf("No subsystems to display.\n");
