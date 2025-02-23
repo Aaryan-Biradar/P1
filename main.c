@@ -129,6 +129,7 @@ int main() {
                     if (result != ERR_SUCCESS) {
                         printf("Data set error.\n");
                     }
+                }    
                 break;
             case MENU_EXIT:
                 return 0;
@@ -139,6 +140,7 @@ int main() {
     }
     return 0;
 }
+
 
 /* 
     Prints a menu to the user and prompts them until they enter a valid menu option.
