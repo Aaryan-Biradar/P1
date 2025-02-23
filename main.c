@@ -128,10 +128,7 @@ int main() {
                     result = subsys_data_set(&collection.subsystems[index], data, &old_data);
                     if (result != ERR_SUCCESS) {
                         printf("Data set error.\n");
-                    } else if (old_data != 0) {
-                        printf("Old data: %08X\n", old_data);
                     }
-                }
                 break;
             case MENU_EXIT:
                 return 0;
