@@ -20,9 +20,11 @@ int main() {
     // The definitions above are provided to assist with this.
 
     SubsystemCollection collection;
+    Subsystem sub;
     subsys_collection_init(&collection);
     int choice;
     int result;
+    int index;
     char name[MAX_STR];
     char filter_str[9];
     unsigned char status_id, value;
@@ -32,23 +34,33 @@ int main() {
         print_menu(&choice);
         switch (choice) {
             case MENU_ADD:
-                printf("Enter subsystem name: ");
+                printf("Enter subsystem name (no spaces): ");
                 scanf("%31s", name);
-                Subsystem sub;
                 subsys_init(&sub, name, 0);
                 result = subsys_append(&collection, &sub);
                 if (result != ERR_SUCCESS) {
                     printf("Error adding subsystem.\n");
+                } 
+                else {
+                    printf("Subsystem '%s' added successfully.\n", name);
                 }
                 break;
             case MENU_PRINT:
-                printf("Enter subsystem name: ");
+                printf("Enter subsystem name to print: ");
                 scanf("%31s", name);
-                int index = subsys_find(&collection, name);
-                if (index < 0) {
-                    printf("Subsystem not found.\n");
-                } else {
-                    subsys_print(&collection.subsystems[index]);
+                index = subsys_find(&collection, name);
+                if (index == ERR_NULL_POINTER) {
+                    printf("Null pointer error.\n");
+                } 
+                else if (index == ERR_SYS_NOT_FOUND){
+                    printf("No subsystem found at this location.\n");
+                }
+                else {
+                    result = subsys_print(&collection.subsystems[index]);
+                    
+                    if (result != ERR_SUCCESS){
+                        printf("Error printing subsystem.");
+                    }
                 }
                 break;
             case MENU_PRINTALL:
@@ -59,26 +71,35 @@ int main() {
                 }
                 break;
             case MENU_STATUS:
-                printf("Enter name, status ID, value: ");
+                printf("Enter: <Subsystem Name> <Status ID (0, 2, 4, 5, 6, 7)> <New Value (0, 1, 2, 3)> ");
                 scanf("%31s %hhu %hhu", name, &status_id, &value);
                 index = subsys_find(&collection, name);
-                if (index < 0) {
-                    printf("Subsystem not found.\n");
-                } else {
+                if (index == ERR_NULL_POINTER) {
+                    printf("Null pointer error.\n");
+                } 
+                else if (index == ERR_SYS_NOT_FOUND){
+                    printf("No subsystem found at this location.\n");
+                } 
+                else {
                     result = subsys_status_set(&collection.subsystems[index], status_id, value);
                     if (result != ERR_SUCCESS) {
-                        printf("Invalid status update.\n");
+                        printf("Invalid status update or new value.\n");
                     }
                 }
                 break;
             case MENU_REMOVE:
-                printf("Enter subsystem name: ");
+                printf("Enter subsystem name (no spaces): ");
                 scanf("%31s", name);
                 index = subsys_find(&collection, name);
-                if (index < 0) {
-                    printf("Subsystem not found.\n");
-                } else {
+                if (index == ERR_NULL_POINTER) {
+                    printf("Null pointer error.\n");
+                } 
+                else if (index == ERR_SYS_NOT_FOUND){
+                    printf("No subsystem found with this name.\n");
+                } 
+                else {
                     subsys_remove(&collection, index);
+                    printf("Subsystem '%s' removed successfully.", name);
                 }
                 break;
             case MENU_FILTER:
@@ -96,9 +117,13 @@ int main() {
                 printf("Enter name and data (HEX in all CAPS without 0x): ");
                 scanf("%31s %X", name, &data);
                 index = subsys_find(&collection, name);
-                if (index < 0) {
-                    printf("Subsystem not found.\n");
-                } else {
+                if (index == ERR_NULL_POINTER) {
+                    printf("Null pointer error.\n");
+                } 
+                else if (index == ERR_SYS_NOT_FOUND){
+                    printf("No subsystem found at this location.\n");
+                } 
+                else {
                     unsigned int old_data;
                     result = subsys_data_set(&collection.subsystems[index], data, &old_data);
                     if (result != ERR_SUCCESS) {

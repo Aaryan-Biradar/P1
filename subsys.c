@@ -48,7 +48,7 @@ int subsys_print(Subsystem *subsystem) {
     if (subsystem == NULL) {
         return ERR_NULL_POINTER;
     }
-    printf("Name: %-16s ", subsystem->name);
+    printf(" - [Name: %-16s, Status: ", subsystem->name);
     subsys_status_print(subsystem);
 
     // if data is avalible add it to the end of status
@@ -58,7 +58,7 @@ int subsys_print(Subsystem *subsystem) {
     }
 
     // "]" formating for status
-    printf("]\n");
+    printf(")]\n");
     return ERR_SUCCESS;
 } 
 
@@ -140,7 +140,7 @@ int subsys_status_print(const Subsystem *subsystem) {
     }
 
     unsigned char status = subsystem->status;
-    printf("[PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d",
+    printf("(PWR: %d | DATA: %d | ACT: %d | ERR: %d | PERF: %d | RES: %d",
            (status >> STATUS_POWER) & 1,
            (status >> STATUS_DATA) & 1,
            (status >> STATUS_ACTIVITY) & 1,

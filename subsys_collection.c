@@ -49,8 +49,6 @@ int subsys_append(SubsystemCollection *subsystems, const Subsystem *subsystem) {
 
     subsystems->subsystems[subsystems->size] = *subsystem;
     subsystems->size++;
-    // "Subsystem '%s' added successfully.\n" as seen in project overview
-    printf("Subsystem '%s' added successfully.\n", subsystem->name);
 
     return ERR_SUCCESS;
 
@@ -161,11 +159,11 @@ int subsys_filter(const SubsystemCollection *src, SubsystemCollection *dest, con
 
     for (int i = 0; i < 8; i++) {
         if (filter[i] == '1') {
-            filter_mask |= 1 << (7 - i); // Set the bit for '1'
+            filter_mask |= 1 << (7 - i); // set the bit for '1'
         } else if (filter[i] == '*') {
-            wildcard_mask |= 1 << (7 - i); // Set the bit for '*'
+            wildcard_mask |= 1 << (7 - i); // set the bit for '*'
         } else if (filter[i] != '0') {
-            return ERR_INVALID_STATUS; // Handle invalid characters
+            return ERR_INVALID_STATUS; 
         }
     }
 
